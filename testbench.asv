@@ -1,0 +1,35 @@
+%% 发送的数据
+rng(1)
+info = rand(10000,1)>0.5;
+%% 编码参数
+nm = [2,4];
+Poly = [13,15];
+%% 编码
+code = ConvEncoder(info,nm,Poly);
+%% 信道 理想
+est = zeros(2^nm(1),length(code)/nm(1));
+for nn = 1:length(code)/nm(1)
+    num = code(nn*nm(1)-nm(1)+1:nn*nm(1));
+    num = bin2dec(char(num'+'0'));
+    est(num+1,nn) = 1;
+end
+
+%% 信道 高斯，映射 角度等分
+code1 = reshape(code,n,[]);
+code1 = code1';
+code1 = bin2dec(code1+'0');
+
+vol = bin2gray(code1,'psk',2^n);
+vol = exp(1i*vol/2^n);
+
+n0 = 0.1;
+noise = random('normal',0,n0/2,size(vol))+1i*random('normal',0,n0/2,size(vol));
+
+vol_out = vol+n0
+
+%% 解码
+info_out = ConvDecoder(est,nm,Poly);
+info_out(1:nm(2)-1) = [];
+%% 计算误码率
+Error = sum(info_out~=info);
+ErrorRate = Error/length(info)
