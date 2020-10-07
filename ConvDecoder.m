@@ -13,19 +13,19 @@ if nargin == 3
 end
     
 Poly = reshape(Poly,[],1);
-Poly = dec2bin(Poly,mp);
-Poly = logical(Poly>'0');
+Poly = de2bi(Poly,mp);
+%Poly = logical(Poly>'0');
 
 %低位均表示时刻靠前的，t=0, 一定在code(1)， 当前时刻在code(last)
 % 十进制转二进制后，最高位对应a(1)，是时间最靠前的位。
 StatePrev = [0:2^m-1;0:2^m-1]'; % 当前状态来自之前的哪个状态 行号表示状态序号+1，列表示m时刻之前是0还是1
-CodeCurrent = StatePrev+[0,1]*2^m; % 该状态在当前(偏后)时刻看到的码 m+1位
-StatePrev = floor(CodeCurrent/2);% 之前的状态为[0或1 State的高m-1位]
+CodeCurrent = StatePrev*2+[0,1]; % 该状态在当前(偏后)时刻看到的码 m+1位
+StatePrev = mod(CodeCurrent,2^m);% 之前的状态为[0或1 State的高m-1位]
 
-CodeCurrent_1 = dec2bin(reshape(CodeCurrent,[],1),mp)>'0';
+CodeCurrent_1 = de2bi(reshape(CodeCurrent,[],1),mp);
 CodeIn = CodeCurrent_1*Poly';
-CodeIn = char(mod(CodeIn,2)+'0');
-CodeIn = bin2dec(CodeIn);
+CodeIn = mod(CodeIn,2);
+CodeIn = bi2de(CodeIn);
 CodeIn = reshape(CodeIn,[],2);
 
 BestCode = zeros(2^m,size(est,2)+1); %当前状态认为的最优上一状态，0或1表示m时刻之前的输入为0或1
