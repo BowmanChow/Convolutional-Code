@@ -17,8 +17,8 @@ elseif ~isempty(find(Poly>2^mp,1))
 end
 
 Poly = reshape(Poly,[],1);
-Poly = dec2bin(Poly,mp);
-Poly = logical(Poly>'0');
+Poly = de2bi(Poly,mp);
+% Poly = logical(Poly>'0');
 %Poly = reshape(Poly',1,mp,n);
 Poly = Poly';
 
