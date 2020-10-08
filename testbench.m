@@ -1,3 +1,4 @@
+clear all; clc;
 %% 发送的数据
 rng(1)
 info = rand(10000,1)>0.5;
@@ -22,14 +23,13 @@ code1 = code1';
 code1 = bi2de(code1);
 
 vol = bin2gray(code1,'psk',2^n);
-vol = exp(2i*pi*vol/2^n);
+vol = ComplexMapping(vol, n);
 
-n00 = 0:0.01:3;
+n00 = 0:0.1:3;
 for k = 1:length(n00)
 n0  = n00(k);
-noise = random('normal',0,n0/2,size(vol))+1i*random('normal',0,n0/2,size(vol));
 
-vol_out = vol+noise;
+vol_out = channel(vol, 0, 0, n0 / 2);
 
 vol1 = vol_out.';
 est = zeros(2^nm(1),length(code)/nm(1));
