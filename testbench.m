@@ -23,16 +23,16 @@ code1 = code1';
 code1 = bi2de(code1);
 
 vol = bin2gray(code1,'psk',2^n);
-vol = ComplexMapping(vol, n);
+vol = ComplexMapping("circle", vol, n);
 
 n00 = 0:0.1:3;
 for k = 1:length(n00)
 n0  = n00(k);
 
-vol_out = channel(vol, 0, 0, n0 / 2);
+vol_out = channel(vol, 0.1, 0.1, n0 / 2);
 
 vol1 = vol_out.';
-est = zeros(2^nm(1),length(code)/nm(1));
+
 est1 = abs(vol1-exp(2i*pi*(0:2^n-1)'/2^n));
 est = -est1(bin2gray(0:2^n-1,'psk',2^n)+1,:);
 

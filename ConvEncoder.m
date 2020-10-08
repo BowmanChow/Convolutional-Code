@@ -5,12 +5,12 @@ function out = ConvEncoder(info_in, nm, Poly)
 n = nm(1);
 mp = nm(2);%m+1
 if length(Poly)~=n
-     msgID = 'myComponent:inputError';
+    msgID = 'myComponent:inputError';
     msgtext = 'Wrong size of Ploynomial.';
     ME = MException(msgID,msgtext);
     throw(ME)
 elseif ~isempty(find(Poly>2^mp,1))
-     msgID = 'myComponent:inputError';
+    msgID = 'myComponent:inputError';
     msgtext = 'Some element in Poly is larger than 2^(m+1).';
     ME = MException(msgID,msgtext);
     throw(ME)
