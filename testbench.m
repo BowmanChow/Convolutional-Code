@@ -22,19 +22,22 @@ code1 = reshape(code,n,[]);
 code1 = code1';
 code1 = bi2de(code1);
 
-vol = bin2gray(code1,'psk',2^n);
-vol = ComplexMapping("circle", vol, n);
+gray = bin2gray(code1,'psk',2^n);
+% gray = distantMapping(code1, n);
+vol = ComplexMapping('circle', gray, n);
 
-n00 = 0:0.1:3;
+n00 = 1:0.1:5;
+SNR = [];
 for k = 1:length(n00)
 n0  = n00(k);
 
-vol_out = channel(vol, 0.1, 0.1, n0 / 2);
+[vol_out, noise] = channel(vol, 1, 1, n0 / 2);
 
 vol1 = vol_out.';
 
-est1 = abs(vol1-exp(2i*pi*(0:2^n-1)'/2^n));
-est = -est1(bin2gray(0:2^n-1,'psk',2^n)+1,:);
+est1 = DeComplexMapping('circle', vol1, n);
+est = est1(bin2gray(0:2^n-1,'psk',2^n)+1,:);
+%est = est1(distantMapping(0:2^n-1, n)+1,:);
 
 
 
@@ -44,8 +47,10 @@ info_out(1:nm(2)-1) = [];
 %% 计算误码率
 Error = sum(info_out~=info);
 ErrorRate(k) = Error/length(info);
+%% SNR
+SNR = [SNR; mean(abs(vol).^2) / mean(abs(noise).^2)];
 end
-plot(n00,ErrorRate)
-xlabel('n0')
+plot(SNR,ErrorRate)
+xlabel('snr')
 ylabel('ErrorRate')
 title('加性白噪声信道')

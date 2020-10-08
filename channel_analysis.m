@@ -1,15 +1,15 @@
-%% Èı¸ö³¡¾°µÄ¹«¹²²¿·Ö£ºµçÆ½Ó³Éä£¬·¢ËÍµÄÊı¾İ£¨ÔËĞĞºóÃæµÄ³ÌĞòÖ®Ç°±ØĞëÏÈÔËĞĞÕâÒ»½Ú£©
+%% ä¸‰ä¸ªåœºæ™¯çš„å…¬å…±éƒ¨åˆ†ï¼šç”µå¹³æ˜ å°„ï¼Œå‘é€çš„æ•°æ®ï¼ˆè¿è¡Œåé¢çš„ç¨‹åºä¹‹å‰å¿…é¡»å…ˆè¿è¡Œè¿™ä¸€èŠ‚ï¼‰
 clc;clear;close all;
-number_of_channel_use = 1000000;   %ĞÅµÀÊ¹ÓÃ´ÎÊı
+number_of_channel_use = 1000000;   %ä¿¡é“ä½¿ç”¨æ¬¡æ•°
 x = zeros(8,1);
 for k = 1:8
-    x(k) = 100*exp(1i*(k-1)*2*pi/8);  %Ç°ÃæµÄÏµÊıÔ½´ó£¬´ú±íĞÅºÅ¹¦ÂÊÔ½´ó£¨µ÷½ÚÕâ¸ö²ÎÊı¿ÉÒÔÔÚ³¡¾°Ò»ºÍ¶ş»ñµÃ¸üºÃµÄĞ§¹û£©
+    x(k) = 100*exp(1i*(k-1)*2*pi/8);  %å‰é¢çš„ç³»æ•°è¶Šå¤§ï¼Œä»£è¡¨ä¿¡å·åŠŸç‡è¶Šå¤§ï¼ˆè°ƒèŠ‚è¿™ä¸ªå‚æ•°å¯ä»¥åœ¨åœºæ™¯ä¸€å’ŒäºŒè·å¾—æ›´å¥½çš„æ•ˆæœï¼‰
 end
 index = randi([1 8],number_of_channel_use,1);
-data = x(index);      %·¢ËÍµÄÊı¾İ£¬Ò²¾ÍÊÇxi
+data = x(index);      %å‘é€çš„æ•°æ®ï¼Œä¹Ÿå°±æ˜¯xi
 
 
-%% ³¡¾°Ò»£¨Ïàµ±ÀíÏëµÄĞÅµÀ£©
+%% åœºæ™¯ä¸€ï¼ˆç›¸å½“ç†æƒ³çš„ä¿¡é“ï¼‰
 a1 = 1;
 data_received1 = a1 * data + sqrt(0.5)*randn(number_of_channel_use,1) + 1i*sqrt(0.5)*randn(number_of_channel_use,1);
 
@@ -18,7 +18,7 @@ scatter(real(data_received1),imag(data_received1));
 figure(2);
 histogram(angle(data_received1),1000);
 
-%% ³¡¾°¶ş£¨Ğ§¹û»¹²»´í£©
+%% åœºæ™¯äºŒï¼ˆæ•ˆæœè¿˜ä¸é”™ï¼‰
 a2 = sqrt(0.5)*randn(1,1) + 1i*sqrt(0.5)*randn(1,1);
 data_received2 = a2 * data + sqrt(0.5)*randn(number_of_channel_use,1) + 1i*sqrt(0.5)*randn(number_of_channel_use,1);
 
@@ -27,14 +27,14 @@ scatter(real(data_received2),imag(data_received2));
 figure(2);
 histogram(angle(data_received2),1000);
 
-%% ³¡¾°Èı(¼ÓµÄÄÇ¸öÔëÉù²»ÖØÒª£¬ÖØÒªµÄÊÇÇ°ÃæÄÇ¸öÏµÊıai£¬ËüµÄÊµ²¿ºÍĞé²¿¶¼ÊÇ¸ßË¹·Ö²¼£¬Ä£ºÍ·ù½ÇÒ²ÊÇ¸ßË¹µÄ)
+%% åœºæ™¯ä¸‰(åŠ çš„é‚£ä¸ªå™ªå£°ä¸é‡è¦ï¼Œé‡è¦çš„æ˜¯å‰é¢é‚£ä¸ªç³»æ•°aiï¼Œå®ƒçš„å®éƒ¨å’Œè™šéƒ¨éƒ½æ˜¯é«˜æ–¯åˆ†å¸ƒï¼Œæ¨¡å’Œå¹…è§’ä¹Ÿæ˜¯é«˜æ–¯çš„)
 b = 0.5;rho = 0.95;
 beta = zeros(number_of_channel_use,1);
 beta(1) = sqrt(0.5)*randn(1,1) + 1i*sqrt(0.5)*randn(1,1);
 for i = 2:number_of_channel_use
     beta(i) = rho*beta(i-1)+sqrt(1-rho^2)*(sqrt(0.5)*randn(1,1) + 1i*sqrt(0.5)*randn(1,1));
 end
-a3 = sqrt(1-b^2) + b*beta;     %½«ÏÂÃæÒ»¾äµÄ×¢ÊÍÈ¡Ïû£¬¾ÍÄÜ½«a3µÄ·ù½Ç±äÎªÔ­À´µÄ1/5£¬Êä³öĞÅºÅ¾ÍºÜ¿É¹ÛÁË
+a3 = sqrt(1-b^2) + b*beta;     %å°†ä¸‹é¢ä¸€å¥çš„æ³¨é‡Šå–æ¶ˆï¼Œå°±èƒ½å°†a3çš„å¹…è§’å˜ä¸ºåŸæ¥çš„1/5ï¼Œè¾“å‡ºä¿¡å·å°±å¾ˆå¯è§‚äº†
 %a3 = abs(a3).*exp(1i*1/5*angle(a3));   
 data_received3 = a3 .* data + sqrt(0.5)*randn(number_of_channel_use,1) + 1i*sqrt(0.5)*randn(number_of_channel_use,1);
 
@@ -43,13 +43,13 @@ scatter(real(data_received3),imag(data_received3));
 figure(2);
 subplot(4,1,1);
 histogram(angle(a3),1000);
-title("a3µÄ·ù½Ç");
+title("a3çš„å¹…è§’");
 subplot(4,1,2);
 histogram(angle(data),1000);
-title("xiµÄ·ù½Ç");
+title("xiçš„å¹…è§’");
 subplot(4,1,3);
 histogram(angle(a3 .* data),1000);
-title("ai*xiµÄ·ù½Ç");
+title("ai*xiçš„å¹…è§’");
 subplot(4,1,4);
 histogram(angle(data_received3),1000);
-title("datareceived3µÄ·ù½Ç");
+title("datareceived3çš„å¹…è§’");
