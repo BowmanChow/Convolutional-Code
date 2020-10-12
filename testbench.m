@@ -1,5 +1,5 @@
 clear all; clc;
-%% 发送的数据
+%% 发�?�的数据
 rng(1)
 info = rand(10000,1)>0.5;
 %% 编码参数
@@ -17,7 +17,7 @@ code = ConvEncoder(info,nm,Poly);
 %     est(num+1,nn) = 1;
 % end
 
-%% 信道 高斯，映射 角度等分
+%% 信道 高斯，映�? 角度等分
 code1 = reshape(code,n,[]);
 code1 = code1';
 code1 = bi2de(code1);
@@ -31,7 +31,7 @@ SNR = [];
 for k = 1:length(n00)
 n0  = n00(k);
 
-[vol_out, noise] = channel(vol, 1, 1, n0 / 2);
+[vol_out, noise] = channel(vol, 0.1, 0.1, n0 / 2);
 
 vol1 = vol_out.';
 
@@ -44,7 +44,7 @@ est = est1(bin2gray(0:2^n-1,'psk',2^n)+1,:);
 %% 解码
 info_out = ConvDecoder(est,nm,Poly);
 info_out(1:nm(2)-1) = [];
-%% 计算误码率
+%% 计算误码�?
 Error = sum(info_out~=info);
 ErrorRate(k) = Error/length(info);
 %% SNR
@@ -53,4 +53,4 @@ end
 plot(SNR,ErrorRate)
 xlabel('snr')
 ylabel('ErrorRate')
-title('加性白噪声信道')
+title('加�?�白噪声信道')
