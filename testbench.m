@@ -31,11 +31,11 @@ SNR = [];
 for k = 1:length(n00)
 n0  = n00(k);
 
-[vol_out, noise] = channel(vol, 1, 1, n0 / 2);
+[vol_out, noise] = channel(vol, 0.1, 0.1, n0 / 2);
 
 vol1 = vol_out.';
 
-est1 = DeComplexMapping('circle', vol1, n);
+est1 = DeComplexMapping('circle', vol1, n, 'soft');
 est = est1(bin2gray(0:2^n-1,'psk',2^n)+1,:);
 %est = est1(distantMapping(0:2^n-1, n)+1,:);
 
