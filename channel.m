@@ -1,4 +1,4 @@
-function y = channel(x, b, rho, NoiseSigma)
+function [y,a,beta,n] = channel(x, b, rho, NoiseSigma)
 
 z = random('normal', 0, sqrt(0.5), size(x)) + 1i .* random('normal', 0, sqrt(0.5), size(x));
 
@@ -9,3 +9,4 @@ a = sqrt(1 - b.^2) + b .* beta;
 n = random('normal', 0, NoiseSigma, size(x)) + 1i .* random('normal', 0, NoiseSigma, size(x));
 
 y = a .* x + n;
+end
