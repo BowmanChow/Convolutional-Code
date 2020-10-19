@@ -1,6 +1,6 @@
 clear all; clc;
 %% 发送的数据
-rng(1)
+% rng(1)
 info = rand(10000,1)>0.5;
 %% 编码参数
 nm = [3,4];
@@ -26,16 +26,67 @@ gray = bin2gray(code1,'psk',2^n);
 % gray = distantMapping(code1, n);
 vol = ComplexMapping('circle', gray, n);
 
-n00 = 1:0.1:5;
-SNR = [];
+%% scenes
+scene = 1;
+if scene == 4 %  b = 1, rho = 1 , need to transfer 1 before sending
+    add_ones_num = 100;
+    vol = [ones(add_ones_num,1);vol];
+elseif scene == 3 % b = 0.5, rho = 0.95, insert 1 cross
+    tmp = zeros(2 * length(vol),1);
+    tmp(1:2:end) = 1;
+    tmp(2:2:end) = vol;
+    vol = tmp;clear tmp;
+end
+
+%% generate a
+if scene == 4
+    b = 1; rho = 1;
+elseif scene == 3
+    b = 0.5; rho = 0.95;
+elseif scene == 2
+    b = 0.1; rho = 0.1;
+elseif scene == 1
+    b = 0; rho = 0;
+end
+[~,~,a, beta] = channel(vol, b, rho, 1, []); 
+
+%% ifKnowA == 0 means both dont know a, ifKnowA == 1 means reciever know a, ifKnowA == 2 means both know a
+ifKnowA = 2;
+if ifKnowA == 2
+    vol = vol ./ a;
+    vol = vol ./ abs(vol);
+end   
+
+%%
+
+n00 = 1 ./ sqrt([0.8:0.01:1.3]);
+SNR = zeros(1,length(n00));ErrorRate = zeros(1,length(n00));
 for k = 1:length(n00)
 n0  = n00(k);
 
-[vol_out, noise] = channel(vol, 0.1, 0.1, n0 / 2);
+[vol_out, noise] = channel(vol, b, rho, n0 / 2, a);
+%% ifKnowA == 0 means both dont know a, ifKnowA == 1 means reciever know a, ifKnowA == 2 means both know a
+if ifKnowA == 0
+    vol_out = vol_out ./ abs(a);
+elseif ifKnowA == 1
+    vol_out = vol_out ./ a;
+end
 
-vol1 = vol_out.';
+%%
+if scene == 3 % b = 0.5, rho = 0.95, insert 1 cross
+    tmp = reshape(vol_out', 2, []);
+    kalman_beta = KalmanFilter(tmp(1,:) - sqrt(1-b^2), rho^2, rho^2*(1-rho^2), b, 2*(n0 / 2)^2, beta(1));
+    vol_out = tmp(2,:)' ./ (sqrt(1-b^2) + b * kalman_beta);
+    clear tmp;
+elseif scene == 4 % b = 1, rho = 1 , need to decode 1 before recieving
+    vol_out = vol_out ./ mean(vol_out(1:add_ones_num));
+    vol_out(1:add_ones_num) = [];
+end
 
-est1 = DeComplexMapping('circle', vol1, n, 'soft');
+%%
+vol_out = vol_out.';
+
+est1 = DeComplexMapping('circle', vol_out, n, 'soft');
 est = est1(bin2gray(0:2^n-1,'psk',2^n)+1,:);
 %est = est1(distantMapping(0:2^n-1, n)+1,:);
 
@@ -48,9 +99,13 @@ info_out(1:nm(2)-1) = [];
 Error = sum(info_out~=info);
 ErrorRate(k) = Error/length(info);
 %% SNR
-SNR = [SNR; mean(abs(vol).^2) / mean(abs(noise).^2)];
+SNR(k) = mean(abs(vol).^2) / mean(abs(noise).^2);
 end
-plot(SNR,ErrorRate)
+x = SNR(1):0.1:SNR(end);
+semilogy(polyval(polyfit(SNR,ErrorRate,3),SNR),SNR)
+%semilogy(SNR,ErrorRate)
+hold on;
+%semilogy(SNR,ErrorRate,'.');
 xlabel('snr')
 ylabel('ErrorRate')
 title('加性白噪声信道')
