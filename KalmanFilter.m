@@ -4,7 +4,7 @@ function  y = KalmanFilter(z, A, Q, H, R, init)
 % Z(k) = H * X(k) + V(k) , Cov(V) = R
 
 if size(z, 1) == 1
-    z = z';
+    z = z.';
 end
 
 X_pre = zeros(size(z));
