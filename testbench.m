@@ -27,16 +27,7 @@ gray = bin2gray(code1,'psk',2^n);
 vol = ComplexMapping('circle', gray, n);
 
 %% scenes
-scene = 1;
-if scene == 4 %  b = 1, rho = 1 , need to transfer 1 before sending
-    add_ones_num = 100;
-    vol = [ones(add_ones_num,1);vol];
-elseif scene == 3 % b = 0.5, rho = 0.95, insert 1 cross
-    tmp = zeros(2 * length(vol),1);
-    tmp(1:2:end) = 1;
-    tmp(2:2:end) = vol;
-    vol = tmp;clear tmp;
-end
+scene = 3;
 
 %% generate a
 if scene == 4
@@ -51,36 +42,48 @@ end
 [~,~,a, beta] = channel(vol, b, rho, 1, []); 
 
 %% ifKnowA == 0 means both dont know a, ifKnowA == 1 means reciever know a, ifKnowA == 2 means both know a
-ifKnowA = 2;
+ifKnowA = 0;
 if ifKnowA == 2
-    vol = vol ./ a;
-    vol = vol ./ abs(vol);
-end   
+    vol = vol ./ (a ./ abs(a));
+elseif ifKnowA == 0
+    if scene == 4               %  b = 1, rho = 1 , need to transfer 1 before sending
+        add_ones_num = 100;
+        vol = [ones(add_ones_num,1);vol];
+    elseif scene == 3           % b = 0.5, rho = 0.95, insert 1 cross
+        tmp = zeros(2 * length(vol),1);
+        tmp(1:2:end) = 1;
+        tmp(2:2:end) = vol;
+        vol = tmp;clear tmp;
+    end
+    [~,~,a, beta] = channel(vol, b, rho, 1, []); 
+end
 
 %%
 
-n00 = 1 ./ sqrt([0.8:0.01:1.3]);
+n00 = 1 ./ sqrt([1.3:0.01:2.7]);
 SNR = zeros(1,length(n00));ErrorRate = zeros(1,length(n00));
 for k = 1:length(n00)
 n0  = n00(k);
 
 [vol_out, noise] = channel(vol, b, rho, n0 / 2, a);
+
 %% ifKnowA == 0 means both dont know a, ifKnowA == 1 means reciever know a, ifKnowA == 2 means both know a
-if ifKnowA == 0
+if ifKnowA == 2
     vol_out = vol_out ./ abs(a);
 elseif ifKnowA == 1
     vol_out = vol_out ./ a;
-end
-
-%%
-if scene == 3 % b = 0.5, rho = 0.95, insert 1 cross
-    tmp = reshape(vol_out', 2, []);
-    kalman_beta = KalmanFilter(tmp(1,:) - sqrt(1-b^2), rho^2, rho^2*(1-rho^2), b, 2*(n0 / 2)^2, beta(1));
-    vol_out = tmp(2,:)' ./ (sqrt(1-b^2) + b * kalman_beta);
-    clear tmp;
-elseif scene == 4 % b = 1, rho = 1 , need to decode 1 before recieving
-    vol_out = vol_out ./ mean(vol_out(1:add_ones_num));
-    vol_out(1:add_ones_num) = [];
+else
+    if scene == 3               % b = 0.5, rho = 0.95, insert 1 cross
+        tmp = reshape(vol_out', 2, []);
+        kalman_beta = KalmanFilter(tmp(1,:) - sqrt(1-b^2), rho^2, rho^2*(1-rho^2), b, 2*(n0 / 2)^2, beta(1));
+        vol_out = tmp(2,:)' ./ (sqrt(1-b^2) + b * kalman_beta);
+        clear tmp;
+    elseif scene == 4           % b = 1, rho = 1 , need to decode 1 before recieving
+        vol_out_mean = mean(vol_out(1:add_ones_num));
+        vol_out_store = vol_out;
+        vol_out = vol_out ./ vol_out_mean;
+        vol_out(1:add_ones_num) = [];
+    end
 end
 
 %%
@@ -89,7 +92,6 @@ vol_out = vol_out.';
 est1 = DeComplexMapping('circle', vol_out, n, 'soft');
 est = est1(bin2gray(0:2^n-1,'psk',2^n)+1,:);
 %est = est1(distantMapping(0:2^n-1, n)+1,:);
-
 
 
 %% 解码
@@ -101,11 +103,13 @@ ErrorRate(k) = Error/length(info);
 %% SNR
 SNR(k) = mean(abs(vol).^2) / mean(abs(noise).^2);
 end
-x = SNR(1):0.1:SNR(end);
-semilogy(polyval(polyfit(SNR,ErrorRate,3),SNR),SNR)
-%semilogy(SNR,ErrorRate)
+
+semilogy(SNR,ErrorRate,'.');
 hold on;
-%semilogy(SNR,ErrorRate,'.');
+xq = SNR(1):0.01:SNR(end);
+ModelFunc = @(p, x) exp(-p(1) .* x + p(2));
+fitline = fitnlm(SNR,ErrorRate,ModelFunc,[1 1]);
+semilogy(xq, predict(fitline, xq'));
 xlabel('snr')
 ylabel('ErrorRate')
 title('加性白噪声信道')
