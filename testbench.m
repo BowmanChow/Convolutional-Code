@@ -30,7 +30,7 @@ infoCRC = zeros(ceil(length(info)/CRC_Unit)*CRC_RLength+length(info),1);
 
     for mm = 0:(length(info)-1)/CRC_Unit
         temp = info(mm*CRC_Unit+1:min((mm+1)*(CRC_Unit),length(info)));
-        [~,r1] = deconv([temp;zeros(CRC_RLength,1)],CRC_Checks);
+        [~,r1] = deconvm2([temp;zeros(CRC_RLength,1)],CRC_Checks);
         infoCRC(mm*(CRC_Unit+CRC_RLength)+1:min((mm+1)*(CRC_Unit+CRC_RLength),length(infoCRC))) = ... 
             [temp;r1(max(end-CRC_RLength+1,0):end)];
     end
@@ -116,7 +116,7 @@ if CRC
     info_out1 = zeros(size(info));
 for mm = 0:(length(info_out)-1)/(CRC_Unit+CRC_RLength)
     temp = info_out(mm*(CRC_Unit+CRC_RLength)+1:min(length(info_out),(mm+1)*(CRC_Unit+CRC_RLength)));
-    [~,r1] = deconv(temp,CRC_Checks);
+    [~,r1] = deconvm2(temp,CRC_Checks);
     info_out1(mm*CRC_Unit+(1:(length(temp)-CRC_RLength)))=temp(1:(length(temp)-CRC_RLength));
     BlockError = BlockError+(sum(r1)>0);
 end
