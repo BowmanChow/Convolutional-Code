@@ -13,7 +13,7 @@ if nargin == 3
 end
     
 Poly = reshape(Poly,[],1);
-Poly = de2bi(Poly,mp);
+Poly = flip(de2bi(Poly,mp),2);
 %Poly = logical(Poly>'0');
 
 %低位均表示时刻靠前的，t=0, 一定在code(1)， 当前时刻在code(last)
@@ -23,7 +23,7 @@ CodeCurrent = StatePrev*2+[0,1]; % 该状态在当前(偏后)时刻看到的码 
 StatePrev = mod(CodeCurrent,2^m);% 之前的状态为[0或1 State的高m-1位]
 
 CodeCurrent_1 = de2bi(reshape(CodeCurrent,[],1),mp);
-CodeIn = CodeCurrent_1*Poly';
+CodeIn = CodeCurrent_1*(Poly)';
 CodeIn = mod(CodeIn,2);
 CodeIn = bi2de(CodeIn);
 CodeIn = reshape(CodeIn,[],2);

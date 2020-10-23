@@ -25,22 +25,35 @@ Poly = Poly';
 cellsize = 1000;%1000位截断一次
 info_in = [zeros(mp-1,1);info_in;zeros(mp-1,1)];
 out = [];
+info_in1 = info_in;
+    for nn = 1:n
+        tmp(:,nn) = conv(info_in1,(Poly(:,nn)),'Valid');
+    end
+    tmp = reshape(tmp.',[],1);
+    out = mod(tmp,2);
 
-while length(info_in)>=mp
-idx = zeros(min(cellsize,size(info_in,1)+1-mp),mp);
-cellsize_1 = size(idx,1);
-for kk = 1:mp
-    idx(:,kk) = kk:kk+cellsize_1-1;
-end
-    cell = info_in(idx);
-    code = cell*Poly;
-    code = reshape(code',[],1);
-    code = mod(code,2);
-    out = [out;code];
-    info_in(1:cellsize_1) = [];
-    
-end
-
+% while length(info_in)>=mp
+% idx = zeros(min(cellsize,size(info_in,1)+1-mp),mp);
+% cellsize_1 = size(idx,1);
+% for kk = 1:mp
+%     idx(:,kk) = kk:kk+cellsize_1-1;
+% end
+%     cell = info_in(idx);
+%     code = cell*Poly;
+%     code = reshape(code',[],1);
+%     code = mod(code,2);
+%     out = [out;code];
+%     info_in(1:cellsize_1) = [];
+% %     tmp = zeros(min(cellsize+mp-1,length(info_in)),n);
+% %     for nn = 1:n
+% %         tmp(:,n) = conv(info_in(1:min(cellsize+mp-1,length(info_in))),flip(Poly(:,1)),'Valid');
+% %     end
+% %     tmp = reshape(tmp.',[],1);
+% %     tmp = mod(tmp,2);
+% %     out = [out;code];
+% %     info_in(1:cellsize_1) = [];
+%     
+% end
 
 
 end
