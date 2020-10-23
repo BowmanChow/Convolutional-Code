@@ -4,8 +4,7 @@ nm = [3,4];                 % n，m
 Poly = [11,13,15];          % Polynomial
 scene = 1;                  % scene; 1-4
 ifKnowA = 2;                % ifKnowA == 0 means both dont know a, ifKnowA == 1 means reciever know a, ifKnowA == 2 means both know a
-% n00 = 1 ./ sqrt([1.3:0.01:2.7]);
-n00 =  sqrt(0.2:0.01:1.3);    % noise
+n00 =  sqrt(0.2:0.05:1.3);    % noise
 L0 = 10000;                 % length of infomation
 rep = 4;                    % repeat times
 CRC = 0;
